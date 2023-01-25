@@ -1,0 +1,28 @@
+---
+
+-
+
+  hosts: switch1
+  connection: network_cli
+  gather_facts: yes
+
+  vars:
+    ansible_network_os: nxos
+
+  tasks:
+    - name: run show version on remote devices
+      cisco.nxos.nxos_command:
+        commands: 
+          - show interface status | ex connected
+      register: result
+
+    - name: display output
+      debug:
+        msg: "The number of available 10G interfaces is: {{result.stdout|regex_findall('Eth[0-9]{1,2}/')|length}}"
+        
+    - name: display output
+      debug:
+        msg: "The number of available 1G interfaces is: {{result.stdout|regex_findall('Eth[0-9]{3}/')|length}}" 
+        
+...
+
