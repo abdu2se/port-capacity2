@@ -1,2 +1,2 @@
 collections:
-  - name: cisco.nxos
+  - name: cisco.nxos.nxos_command
