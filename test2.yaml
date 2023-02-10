@@ -7,7 +7,7 @@
   gather_facts: yes
 
   vars:
-    ansible_network_os: cisco.nxos.nxos
+    ansible_network_os: nxos
 
   tasks:
     - name: run show version on remote devices
