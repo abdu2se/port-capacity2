@@ -2,7 +2,7 @@
 
 -
 
-  hosts: switch1
+  hosts: switches
   connection: network_cli
   gather_facts: yes
 
@@ -12,16 +12,24 @@
   tasks:
     - name: run show version on remote devices
       cisco.nxos.nxos_command:
-        commands: show interface status | ex connected
+        commands: 
+          - show interface status | ex connected
       register: result
 
-    - name: display output
+    - name: Retrieve the hostname of the switch
+      cisco.nxos.nxos_command:
+        commands:
+          - show hostname
+      register: switch_hostname
+
+    - name: Sum up the number of available 1G and 10G interfaces
+      set_fact:
+        total_10G_interfaces: "{{ total_10G_interfaces|default(0) + (result.stdout|regex_findall('Eth[0-9]{1,2}/')|length) }}"
+        total_1G_interfaces: "{{ total_1G_interfaces|default(0) + (result.stdout|regex_findall('Eth[0-9]{3}/')|length) }}"
+
+    - name: Display the total number of available 1G and 10G interfaces
       debug:
-        msg: "The number of available 10G interfaces is: {{result.stdout|regex_findall('Eth[0-9]{1,2}/')|length}}"
-        
-    - name: display output
-      debug:
-        msg: "The number of available 1G interfaces is: {{result.stdout|regex_findall('Eth[0-9]{3}/')|length}}" 
+        msg: "The switch {{ switch_hostname.stdout[0].strip() }} has a total of {{ total_10G_interfaces }} 10G interfaces and {{ total_1G_interfaces }} 1G interfaces available."
         
 ...
 
